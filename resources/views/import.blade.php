@@ -172,11 +172,11 @@
                     <div class="mb-4">
                         <label class="form-label">Kategori Data <span class="text-danger">*</span></label>
                         <select name="kategori" class="form-select form-select-custom" required>
-                            <option value="" disabled selected>-- Pilih Jenis Data yang Diupload --</option>
-                            <option value="pns">👥 Data Pegawai PNS</option>
-                            <option value="cpns">👥 Data Pegawai CPNS</option>
-                            <option value="pppk">👥 Data Pegawai PPPK</option>
-                            <option value="riwayat_cuti">📅 Data Riwayat Cuti</option>
+                            <option value="" disabled selected> Pilih Jenis Data yang Diupload </option>
+                            <option value="pns"> Data Pegawai PNS</option>
+                            <option value="cpns"> Data Pegawai CPNS</option>
+                            <option value="pppk"> Data Pegawai PPPK</option>
+                            <option value="riwayat_cuti"> Data Riwayat Cuti</option>
                         </select>
                         <div class="form-text text-muted small mt-2">
                             <i class="bi bi-info-circle me-1"></i> Pilih kategori yang sesuai dengan isi file Excel Anda.

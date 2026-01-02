@@ -8,8 +8,8 @@ use App\Models\PegawaiCpns;
 use App\Models\PegawaiPppk;
 use App\Models\RiwayatCuti;
 use Carbon\Carbon;
-use Maatwebsite\Excel\Facades\Excel; // Tambahkan ini
-use App\Exports\SisaCutiExport;        // Tambahkan ini
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\SisaCutiExport;
 
 class CekCutiController extends Controller
 {
@@ -29,7 +29,6 @@ class CekCutiController extends Controller
         return view('cek_cuti', compact('data'));
     }
 
-    // --- FUNGSI BARU UNTUK EXPORT ---
     public function export(Request $request)
     {
         $data = $this->calculateData($request);
@@ -43,7 +42,6 @@ class CekCutiController extends Controller
         return Excel::download(new SisaCutiExport($data), $namaFile);
     }
 
-    // --- LOGIKA UTAMA (DIPISAH AGAR BISA DIPAKAI EXPORT & CHECK) ---
     private function calculateData(Request $request)
     {
         $request->validate(['keyword' => 'required|string']);
@@ -70,13 +68,22 @@ class CekCutiController extends Controller
         $allRiwayat = RiwayatCuti::where('nip', $pegawai->nip)->get();
         $targetYear = $request->input('tgl_dari') ? Carbon::parse($request->input('tgl_dari'))->year : Carbon::now()->year;
         
+        // Helper: Hitung Pemakaian Cuti Tahunan
         $hitungPakai = function($tahun) use ($allRiwayat) {
             return $allRiwayat->filter(function($item) use ($tahun) {
                 try { $date = Carbon::parse($item->tanggal_mulai); } catch (\Exception $e) { return false; }
-                $isTahunSama = $date->year == $tahun;
-                $isCutiTahunan = trim(strtolower($item->jenis_cuti)) === 'cuti tahunan';
-                return $isTahunSama && $isCutiTahunan;
+                return $date->year == $tahun && trim(strtolower($item->jenis_cuti)) === 'cuti tahunan';
             })->sum('lama_cuti');
+        };
+
+        // Helper: Cek Cuti Besar
+        // Mengecek apakah ada "Cuti Besar" di tahun tersebut
+        $cekCutiBesar = function($tahun) use ($allRiwayat) {
+            return $allRiwayat->contains(function ($item) use ($tahun) {
+                try { $date = Carbon::parse($item->tanggal_mulai); } catch (\Exception $e) { return false; }
+                // Cek string "Besar" (case insensitive) pada jenis cuti
+                return $date->year == $tahun && stripos($item->jenis_cuti, 'besar') !== false;
+            });
         };
 
         // 3. LOGIKA BERANTAI
@@ -84,23 +91,43 @@ class CekCutiController extends Controller
 
         // T-2
         $yearA = $targetYear - 2;
-        $usageA = $hitungPakai($yearA);
-        $sisaA = $jatahDasar - $usageA;
+        // Jika tahun T-2 ambil Cuti Besar, sisa hangus (0)
+        if ($cekCutiBesar($yearA)) {
+            $sisaA = 0;
+        } else {
+            $usageA = $hitungPakai($yearA);
+            $sisaA = $jatahDasar - $usageA;
+        }
         $carryOverToB = max(0, min($sisaA, 6)); 
 
         // T-1
         $yearB = $targetYear - 1;
-        $usageB = $hitungPakai($yearB);
-        $totalQuotaB = $jatahDasar + $carryOverToB;
-        $sisaB = $totalQuotaB - $usageB;
-        
+        // Jika tahun T-1 ambil Cuti Besar, sisa hangus (0)
+        if ($cekCutiBesar($yearB)) {
+            $sisaB = 0;
+        } else {
+            $usageB = $hitungPakai($yearB);
+            $totalQuotaB = $jatahDasar + $carryOverToB;
+            $sisaB = $totalQuotaB - $usageB;
+        }
         $carryOverTahunLalu = max(0, min($sisaB, 6)); 
 
-        // Target Year
+        // Target Year (T)
         $cutiTerpakai = $hitungPakai($targetYear);
         $totalJatah = $jatahDasar + $carryOverTahunLalu;
-        $sisaCuti = $totalJatah - $cutiTerpakai;
-        $carryOverTahunDepan = max(0, min($sisaCuti, 6));
+        
+        $ambilCutiBesarTahunIni = $cekCutiBesar($targetYear);
+
+        if ($ambilCutiBesarTahunIni) {
+            // Jika tahun ini ambil Cuti Besar:
+            // Sisa Cuti Tahunan HANGUS (Jadi 0)
+            // Carry Over ke tahun depan juga HANGUS (Jadi 0)
+            $sisaCuti = 0;
+            $carryOverTahunDepan = 0;
+        } else {
+            $sisaCuti = $totalJatah - $cutiTerpakai;
+            $carryOverTahunDepan = max(0, min($sisaCuti, 6));
+        }
 
         // 4. CHART DATA
         // Donut (Bulanan)
@@ -169,6 +196,7 @@ class CekCutiController extends Controller
             'total_jatah' => $totalJatah,
             'cuti_terpakai' => $cutiTerpakai,
             'carry_over_tahun_depan' => $carryOverTahunDepan,
+            'status_cuti_besar' => $ambilCutiBesarTahunIni, 
             'riwayat' => $riwayatTable,
             'tahun' => $targetYear,
             'chart_donut' => array_values($monthlyUsage),

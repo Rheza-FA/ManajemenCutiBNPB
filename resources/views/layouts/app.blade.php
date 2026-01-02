@@ -11,9 +11,9 @@
 
     <style>
         :root {
-            --bnpb-blue: #0f3878;   /* Warna Biru Tua BNPB */
-            --bnpb-orange: #ff6b00; /* Warna Oranye BNPB */
-            --bg-light: #f1f5f9;    /* Background Abu Muda */
+            --bnpb-blue: #0f3878;   
+            --bnpb-orange: #ff6b00; 
+            --bg-light: #f1f5f9;    
         }
 
         body {
@@ -22,11 +22,26 @@
             color: #334155;
         }
 
-        /* --- SIDEBAR STYLE --- */
+        /* --- SIDEBAR STYLE (UPDATED) --- */
         .sidebar {
             background-color: var(--bnpb-blue);
-            min-height: 100vh;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            
+            /* LOGIKA AGAR NAVIGASI DIAM DI TEMPAT SAAT SCROLL */
+            position: sticky;       /* Membuat elemen menempel */
+            top: 0;                 /* Menempel di bagian paling atas layar */
+            height: 100vh;          /* Tinggi sidebar pas 1 layar penuh */
+            overflow-y: auto;       /* Jika menu terlalu banyak, bisa discroll di dalam sidebar */
+            z-index: 1000;          /* Agar berada di atas elemen lain */
+        }
+
+        /* Kustomisasi Scrollbar untuk Sidebar (Opsional - agar lebih rapi) */
+        .sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
         }
 
         .sidebar-brand {
@@ -75,6 +90,7 @@
         /* --- CONTENT STYLE --- */
         .main-content {
             padding: 30px;
+            /* Pastikan konten tidak tertutup sidebar */
         }
 
         .navbar-mobile {
@@ -112,7 +128,7 @@
                         <i class="bi bi-cloud-upload"></i> Import Data
                     </a>
                 </li>
-                </ul>
+            </ul>
         </div>
 
         <main class="col-md-9 ms-sm-auto col-lg-10 main-content">

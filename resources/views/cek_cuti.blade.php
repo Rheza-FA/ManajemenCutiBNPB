@@ -123,7 +123,7 @@
         <h3 class="fw-bold text-bnpb-blue mb-1">
             <i class="bi bi-speedometer2 me-2"></i>Dashboard Cuti
         </h3>
-        <p class="text-muted mb-0 small">Pantau status cuti dan riwayat pengajuan pegawai secara real-time.</p>
+        <p class="text-muted mb-0 small">Pantau status cuti dan riwayat pengajuan pegawai.</p>
     </div>
     <div class="d-none d-md-flex align-items-center bg-white px-4 py-2 rounded-pill shadow-sm border">
         <div class="me-3 text-end lh-1">
@@ -226,6 +226,19 @@
             
             <div class="card-body p-4 d-flex flex-column justify-content-center">
                 @if(isset($data))
+                    
+                    {{-- ALERT JIKA CUTI BESAR --}}
+                    @if($data['status_cuti_besar'])
+                    <div class="alert alert-warning d-flex align-items-start mb-4 shadow-sm border-0" role="alert" style="background-color: #fff7ed; color: #c2410c;">
+                        <i class="bi bi-exclamation-triangle-fill me-2 mt-1"></i>
+                        <div class="small lh-sm">
+                            <strong>Perhatian:</strong><br>
+                            Pegawai mengambil <u>Cuti Besar</u> tahun ini. Sisa Cuti Tahunan otomatis <strong>HANGUS</strong>.
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- ANGKA SISA CUTI (SELALU TAMPIL) --}}
                     <div class="text-center mb-4 position-relative">
                         <div class="display-3 fw-bold {{ $data['sisa_cuti'] < 0 ? 'text-danger' : 'text-success' }}">
                             {{ $data['sisa_cuti'] }}
@@ -237,27 +250,34 @@
                     </div>
                     
                     <div class="vstack gap-3">
-                        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 border-dashed">
-                            <span class="stat-label">Jatah Dasar</span>
-                            <span class="stat-value">{{ $data['jatah_dasar'] }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 border-dashed">
-                            <span class="stat-label">Carry Over (Lalu)</span>
-                            <span class="stat-value text-primary">+ {{ $data['carry_over_tahun_lalu'] }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded">
-                            <span class="stat-label fw-bold text-dark">Total Jatah</span>
-                            <span class="stat-value text-dark">{{ $data['total_jatah'] }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 border-dashed">
-                            <span class="stat-label text-danger">Cuti Diambil</span>
-                            <span class="stat-value text-danger">- {{ $data['cuti_terpakai'] }}</span>
-                        </div>
+                        
+                        {{-- TAMPILKAN RINCIAN HANYA JIKA BUKAN CUTI BESAR --}}
+                        @if(!$data['status_cuti_besar'])
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 border-dashed">
+                                <span class="stat-label">Jatah Dasar</span>
+                                <span class="stat-value">{{ $data['jatah_dasar'] }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 border-dashed">
+                                <span class="stat-label">Carry Over (Lalu)</span>
+                                <span class="stat-value text-primary">+ {{ $data['carry_over_tahun_lalu'] }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded">
+                                <span class="stat-label fw-bold text-dark">Total Jatah</span>
+                                <span class="stat-value text-dark">{{ $data['total_jatah'] }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 border-dashed">
+                                <span class="stat-label text-danger">Cuti Diambil</span>
+                                <span class="stat-value text-danger">- {{ $data['cuti_terpakai'] }}</span>
+                            </div>
+                        @endif
+
+                        {{-- CARRY OVER DEPAN (SELALU TAMPIL) --}}
                         <div class="d-flex justify-content-between align-items-center pt-1">
                             <span class="stat-label fw-bold text-bnpb-blue">Carry Over (Depan)</span>
                             <span class="stat-value text-bnpb-blue">{{ $data['carry_over_tahun_depan'] }}</span>
                         </div>
                     </div>
+
                 @else
                     <div class="text-center py-5 text-muted">
                         <i class="bi bi-clipboard-data fs-1 d-block mb-3 opacity-25"></i>
