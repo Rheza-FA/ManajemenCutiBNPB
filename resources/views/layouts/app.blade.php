@@ -20,28 +20,48 @@
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-light);
             color: #334155;
+            overflow-x: hidden;
         }
 
-        /* --- SIDEBAR STYLE (UPDATED) --- */
+        /* --- SIDEBAR STYLE DESKTOP (Default) --- */
         .sidebar {
             background-color: var(--bnpb-blue);
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-            
-            /* LOGIKA AGAR NAVIGASI DIAM DI TEMPAT SAAT SCROLL */
-            position: sticky;       /* Membuat elemen menempel */
-            top: 0;                 /* Menempel di bagian paling atas layar */
-            height: 100vh;          /* Tinggi sidebar pas 1 layar penuh */
-            overflow-y: auto;       /* Jika menu terlalu banyak, bisa discroll di dalam sidebar */
-            z-index: 1000;          /* Agar berada di atas elemen lain */
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.3s ease-in-out;
         }
 
-        /* Kustomisasi Scrollbar untuk Sidebar (Opsional - agar lebih rapi) */
-        .sidebar::-webkit-scrollbar {
-            width: 5px;
-        }
-        .sidebar::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
-            border-radius: 10px;
+        /* --- SIDEBAR STYLE MOBILE (Off-Canvas) --- */
+        @media (max-width: 767.98px) {
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                top: 0;
+                bottom: 0;
+                width: 280px;
+                height: 100%;
+                z-index: 1050; /* Paling atas */
+            }
+            
+            .sidebar.show {
+                left: 0;
+            }
+
+            .sidebar-overlay {
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 1040;
+                display: none;
+                backdrop-filter: blur(2px);
+            }
+            .sidebar-overlay.show {
+                display: block;
+            }
         }
 
         .sidebar-brand {
@@ -89,14 +109,78 @@
 
         /* --- CONTENT STYLE --- */
         .main-content {
-            padding: 30px;
-            /* Pastikan konten tidak tertutup sidebar */
+            padding: 20px;
+        }
+        @media (min-width: 768px) {
+            .main-content {
+                padding: 30px;
+            }
         }
 
+       /* --- NAVBAR MOBILE STYLE (NO STICKY) --- */
         .navbar-mobile {
-            background-color: var(--bnpb-blue);
+            /* 1. Warna & Text */
+            background-color: var(--bnpb-blue) !important; 
             color: white;
+
+            /* 2. HAPUS 'position: sticky' dan 'top'. Ganti jadi relative */
+            position: relative; 
+            /* top: 20px; <-- BARIS INI DIHAPUS SAJA */
+            
+            /* 3. Style Kosmetik (Tetap Floating Card) */
+            z-index: 990; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+            border-radius: 8px !important;
+            margin-bottom: 1.5rem; 
         }
+
+        /* --- TABLE RESPONSIVE MOBILE (FIX LAYOUT TABEL) --- */
+        @media (max-width: 767.98px) {
+            /* Agar tabel bisa di-scroll ke samping */
+            .table-responsive-mobile {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            /* Agar teks Periode memanjang ke samping (tidak tumpuk ke bawah) */
+            .table-responsive-mobile .table th,
+            .table-responsive-mobile .table td {
+                white-space: nowrap; 
+            }
+        }
+
+        /* Custom Tabs untuk Mobile */
+.nav-pills-custom .nav-link {
+    color: #64748b;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 8px 16px;
+    margin-right: 8px;
+    transition: all 0.2s;
+}
+.nav-pills-custom .nav-link.active {
+    background-color: var(--bnpb-blue);
+    color: #fff;
+    border-color: var(--bnpb-blue);
+    box-shadow: 0 4px 6px rgba(15, 56, 120, 0.2);
+}
+/* Card Modern */
+.card-hero {
+    background: linear-gradient(135deg, #0f3878 0%, #1e4d9c 100%);
+    color: white;
+    border: none;
+}
+.stat-box-light {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 10px;
+    backdrop-filter: blur(5px);
+}
         
         footer {
             color: #94a3b8;
@@ -109,10 +193,22 @@
 </head>
 <body>
 
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-3 col-lg-2 d-none d-md-block sidebar px-0">
-            <a href="#" class="sidebar-brand">
+        <div class="col-md-3 col-lg-2 sidebar px-0" id="sidebarMenu">
+            <div class="d-flex justify-content-between align-items-center pe-3 d-md-none">
+                <a href="#" class="sidebar-brand mb-0 border-0">
+                    <i class="bi bi-building-fill-check fs-4 text-warning"></i>
+                    <span>Cuti BNPB</span>
+                </a>
+                <button class="btn btn-sm text-white-50" onclick="toggleSidebar()">
+                    <i class="bi bi-x-lg fs-4"></i>
+                </button>
+            </div>
+
+            <a href="#" class="sidebar-brand d-none d-md-flex">
                 <i class="bi bi-building-fill-check fs-4 text-warning"></i>
                 <span>Cuti BNPB</span>
             </a>
@@ -134,9 +230,12 @@
         <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
             <nav class="navbar navbar-mobile d-md-none mb-4 rounded shadow-sm px-3 py-2">
                 <div class="d-flex align-items-center w-100 justify-content-between">
-                    <span class="navbar-brand mb-0 h1 text-white">Cuti BNPB</span>
-                    <button class="btn btn-sm btn-outline-light" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu">
-                        <i class="bi bi-list"></i>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-building-fill-check text-warning"></i>
+                        <span class="fw-bold text-white small">Cuti BNPB</span>
+                    </div>
+                    <button class="btn btn-sm text-white border-0" type="button" onclick="toggleSidebar()">
+                        <i class="bi bi-list fs-4"></i>
                     </button>
                 </div>
             </nav>
@@ -151,5 +250,16 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Script Sederhana untuk Toggle Sidebar Mobile
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebarMenu');
+        const overlay = document.getElementById('sidebarOverlay');
+        
+        sidebar.classList.toggle('show');
+        overlay.classList.toggle('show');
+    }
+</script>
 </body>
 </html>

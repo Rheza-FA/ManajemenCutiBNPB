@@ -42,7 +42,7 @@ class CekCutiController extends Controller
         return Excel::download(new SisaCutiExport($data), $namaFile);
     }
 
-    private function calculateData(Request $request)
+   private function calculateData(Request $request)
     {
         $request->validate(['keyword' => 'required|string']);
         $keyword = trim($request->input('keyword'));
@@ -68,7 +68,6 @@ class CekCutiController extends Controller
         $allRiwayat = RiwayatCuti::where('nip', $pegawai->nip)->get();
         $targetYear = $request->input('tgl_dari') ? Carbon::parse($request->input('tgl_dari'))->year : Carbon::now()->year;
         
-        // Helper: Hitung Pemakaian Cuti Tahunan
         $hitungPakai = function($tahun) use ($allRiwayat) {
             return $allRiwayat->filter(function($item) use ($tahun) {
                 try { $date = Carbon::parse($item->tanggal_mulai); } catch (\Exception $e) { return false; }
@@ -76,33 +75,42 @@ class CekCutiController extends Controller
             })->sum('lama_cuti');
         };
 
-        // Helper: Cek Cuti Besar
-        // Mengecek apakah ada "Cuti Besar" di tahun tersebut
         $cekCutiBesar = function($tahun) use ($allRiwayat) {
             return $allRiwayat->contains(function ($item) use ($tahun) {
                 try { $date = Carbon::parse($item->tanggal_mulai); } catch (\Exception $e) { return false; }
-                // Cek string "Besar" (case insensitive) pada jenis cuti
                 return $date->year == $tahun && stripos($item->jenis_cuti, 'besar') !== false;
             });
         };
 
-        // 3. LOGIKA BERANTAI
+        // 3. LOGIKA BERANTAI (DIPERBAIKI: MUNDUR SAMPAI T-3)
         $jatahDasar = 12;
 
-        // T-2
+        // --- TAHUN T-3 (Contoh: 2023) ---
+        // Kita hitung ini agar T-2 punya modal carry over yang benar
+        $yearC = $targetYear - 3;
+        if ($cekCutiBesar($yearC)) {
+            $sisaC = 0;
+        } else {
+            $usageC = $hitungPakai($yearC);
+            // Asumsi T-3 start flat 12 (karena kita tidak mungkin mundur selamanya)
+            $sisaC = $jatahDasar - $usageC; 
+        }
+        $carryOverToA = max(0, min($sisaC, 6)); // Carry Over ke T-2
+
+        // --- TAHUN T-2 (Contoh: 2024) ---
         $yearA = $targetYear - 2;
-        // Jika tahun T-2 ambil Cuti Besar, sisa hangus (0)
         if ($cekCutiBesar($yearA)) {
             $sisaA = 0;
         } else {
             $usageA = $hitungPakai($yearA);
-            $sisaA = $jatahDasar - $usageA;
+            // Disini perbedaannya: Modal T-2 sekarang 12 + CarryOver dari T-3
+            $totalQuotaA = $jatahDasar + $carryOverToA; 
+            $sisaA = $totalQuotaA - $usageA;
         }
-        $carryOverToB = max(0, min($sisaA, 6)); 
+        $carryOverToB = max(0, min($sisaA, 6)); // Carry Over ke T-1
 
-        // T-1
+        // --- TAHUN T-1 (Contoh: 2025) ---
         $yearB = $targetYear - 1;
-        // Jika tahun T-1 ambil Cuti Besar, sisa hangus (0)
         if ($cekCutiBesar($yearB)) {
             $sisaB = 0;
         } else {
@@ -110,18 +118,15 @@ class CekCutiController extends Controller
             $totalQuotaB = $jatahDasar + $carryOverToB;
             $sisaB = $totalQuotaB - $usageB;
         }
-        $carryOverTahunLalu = max(0, min($sisaB, 6)); 
+        $carryOverTahunLalu = max(0, min($sisaB, 6)); // INI YANG AKAN TAMPIL DI DASHBOARD
 
-        // Target Year (T)
+        // --- TAHUN TARGET (Contoh: 2026) ---
         $cutiTerpakai = $hitungPakai($targetYear);
         $totalJatah = $jatahDasar + $carryOverTahunLalu;
         
         $ambilCutiBesarTahunIni = $cekCutiBesar($targetYear);
 
         if ($ambilCutiBesarTahunIni) {
-            // Jika tahun ini ambil Cuti Besar:
-            // Sisa Cuti Tahunan HANGUS (Jadi 0)
-            // Carry Over ke tahun depan juga HANGUS (Jadi 0)
             $sisaCuti = 0;
             $carryOverTahunDepan = 0;
         } else {
@@ -129,8 +134,7 @@ class CekCutiController extends Controller
             $carryOverTahunDepan = max(0, min($sisaCuti, 6));
         }
 
-        // 4. CHART DATA
-        // Donut (Bulanan)
+        // 4. CHART & FORMATTING (TETAP SAMA)
         $monthlyUsage = array_fill(1, 12, 0); 
         foreach($allRiwayat as $item) {
             try {
@@ -141,7 +145,6 @@ class CekCutiController extends Controller
             } catch (\Exception $e) {}
         }
 
-        // Line (Jenis Cuti)
         $jenisCutiList = $allRiwayat->filter(function($item) use ($targetYear) {
             return Carbon::parse($item->tanggal_mulai)->year == $targetYear;
         })->pluck('jenis_cuti')->unique()->values();
@@ -169,7 +172,6 @@ class CekCutiController extends Controller
             $colorIndex++;
         }
 
-        // 5. FORMATTING
         $riwayatTable = $allRiwayat->filter(function($item){
              return trim(strtolower($item->jenis_cuti)) === 'cuti tahunan';
         })->sortByDesc('tanggal_mulai')->values();
@@ -202,5 +204,5 @@ class CekCutiController extends Controller
             'chart_donut' => array_values($monthlyUsage),
             'chart_line' => $lineChartData
         ];
-    }
+    } 
 }
