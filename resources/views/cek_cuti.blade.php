@@ -116,6 +116,72 @@
         font-weight: 600;
         border-radius: 30px;
     }
+
+    /* --- HERO CARD --- */
+    .card-hero {
+        background: linear-gradient(135deg, #0f3878 0%, #1e4d9c 100%);
+        color: white;
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    
+    .card-hero:hover {
+        transform: translateY(-5px); 
+        box-shadow: 0 15px 35px rgba(15, 56, 120, 0.4) !important; 
+    }
+
+    .stat-box-light {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 10px;
+        backdrop-filter: blur(5px);
+        height: 100%;
+    }
+    
+    /* Custom Tabs */
+    .nav-pills-custom .nav-link {
+        color: #64748b;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        padding: 10px 20px;
+        margin-right: 10px;
+        transition: all 0.2s;
+    }
+    .nav-pills-custom .nav-link:hover {
+        background-color: #f1f5f9;
+    }
+    .nav-pills-custom .nav-link.active {
+        background-color: var(--bnpb-blue);
+        color: #fff;
+        border-color: var(--bnpb-blue);
+        box-shadow: 0 4px 6px rgba(15, 56, 120, 0.2);
+    }
+    .nav-pills-custom .nav-link i {
+        margin-right: 6px;
+    }
+    /* --- FIX TOMBOL MOBILE --- */
+    @media (max-width: 767.98px) {
+        .btn-mobile-fix {
+            padding: 8px 10px !important; 
+            font-size: 0.85rem !important; 
+            white-space: nowrap; 
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            width: 100%; 
+        }
+        .btn-mobile-fix i {
+            font-size: 1.1rem !important;
+        }
+        .btn-mobile-fix .me-2 {
+            margin-right: 6px !important; 
+        }
+    }
 </style>
 
 <div class="d-flex justify-content-between align-items-center mb-5 fade-in-up">
@@ -178,16 +244,20 @@
                         </div>
                     </div>
 
-                    <div class="d-flex gap-3">
-                        <button type="submit" class="btn btn-bnpb-primary d-flex align-items-center" id="btnCari">
-                            <i class="bi bi-search me-2"></i> Cari Data
+                    <div class="d-flex gap-2 gap-md-3">
+                        
+                        <button type="submit" class="btn btn-bnpb-primary btn-mobile-fix flex-grow-1 flex-md-grow-0" id="btnCari">
+                            <i class="bi bi-search me-2"></i> 
+                            <span>Cari Data</span>
                         </button>
                         
                         @if(isset($data))
-                        <button type="submit" formaction="{{ route('cek-cuti.export') }}" class="btn btn-bnpb-secondary d-flex align-items-center">
-                            <i class="bi bi-file-earmark-excel me-2"></i> Export Excel
+                        <button type="submit" formaction="{{ route('cek-cuti.export') }}" class="btn btn-bnpb-secondary btn-mobile-fix flex-grow-1 flex-md-grow-0">
+                            <i class="bi bi-file-earmark-excel me-2"></i> 
+                            <span>Export Excel</span>
                         </button>
                         @endif
+                        
                     </div>
                 </form>
 
@@ -204,6 +274,7 @@
                             <div class="d-flex flex-wrap gap-2 mb-2">
                                 <span class="badge bg-secondary bg-opacity-10 text-secondary border fw-normal">{{ $data['pegawai']->nip }}</span>
                                 <span class="badge bg-info bg-opacity-10 text-info border fw-normal">{{ $data['pegawai']->jenis }}</span>
+                                <span class="badge bg-success bg-opacity-10 text-success border fw-normal">{{ $data['pegawai']->golongan }}</span>
                             </div>
                             <p class="mb-1 text-dark fw-medium small">{{ $data['pegawai']->jabatan }}</p>
                             <p class="mb-0 text-muted small"><i class="bi bi-building me-1"></i> {{ $data['pegawai']->unit_kerja }}</p>
@@ -216,186 +287,212 @@
     </div>
 
     <div class="col-lg-4 fade-in-up delay-200">
-        <div class="card card-custom h-100 bg-white">
-            <div class="card-header-custom justify-content-between">
-                <div>
-                    <i class="bi bi-pie-chart text-bnpb-orange"></i> Ringkasan Cuti
-                </div>
-                <span class="badge bg-light text-dark border">{{ isset($data) ? $data['tahun'] : date('Y') }}</span>
-            </div>
-            
-            <div class="card-body p-4 d-flex flex-column justify-content-center">
-                @if(isset($data))
+        @if(isset($data))
+            <div class="card card-hero shadow-lg h-100">
+                <div class="card-body p-4 d-flex flex-column">
                     
-                    {{-- ALERT JIKA CUTI BESAR --}}
-                    @if($data['status_cuti_besar'])
-                    <div class="alert alert-warning d-flex align-items-start mb-4 shadow-sm border-0" role="alert" style="background-color: #fff7ed; color: #c2410c;">
-                        <i class="bi bi-exclamation-triangle-fill me-2 mt-1"></i>
-                        <div class="small lh-sm">
-                            <strong>Perhatian:</strong><br>
-                            Pegawai mengambil <u>Cuti Besar</u> tahun ini. Sisa Cuti Tahunan otomatis <strong>HANGUS</strong>.
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h6 class="text-white-50 text-uppercase ls-1 mb-1" style="letter-spacing: 1px; font-size: 0.75rem;">Sisa Cuti Tahun {{ $data['tahun'] }}</h6>
+                            <h2 class="display-4 fw-bold mb-0">{{ $data['sisa_cuti'] }} <span class="fs-6 fw-normal">Hari</span></h2>
                         </div>
-                    </div>
-                    @endif
-
-                    {{-- ANGKA SISA CUTI (SELALU TAMPIL) --}}
-                    <div class="text-center mb-4 position-relative">
-                        <div class="display-3 fw-bold {{ $data['sisa_cuti'] < 0 ? 'text-danger' : 'text-success' }}">
-                            {{ $data['sisa_cuti'] }}
-                        </div>
-                        <div class="text-muted fw-bold small text-uppercase">Hari Tersisa</div>
-                        
-                        <div class="position-absolute top-50 start-50 translate-middle rounded-circle" 
-                             style="width: 120px; height: 120px; background: {{ $data['sisa_cuti'] < 0 ? '#fee2e2' : '#dcfce7' }}; z-index: -1; opacity: 0.5;"></div>
-                    </div>
-                    
-                    <div class="vstack gap-3">
-                        
-                        {{-- TAMPILKAN RINCIAN HANYA JIKA BUKAN CUTI BESAR --}}
-                        @if(!$data['status_cuti_besar'])
-                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 border-dashed">
-                                <span class="stat-label">Jatah Dasar</span>
-                                <span class="stat-value">{{ $data['jatah_dasar'] }}</span>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 border-dashed">
-                                <span class="stat-label">Carry Over (Lalu)</span>
-                                <span class="stat-value text-primary">+ {{ $data['carry_over_tahun_lalu'] }}</span>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded">
-                                <span class="stat-label fw-bold text-dark">Total Jatah</span>
-                                <span class="stat-value text-dark">{{ $data['total_jatah'] }}</span>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 border-dashed">
-                                <span class="stat-label text-danger">Cuti Diambil</span>
-                                <span class="stat-value text-danger">- {{ $data['cuti_terpakai'] }}</span>
-                            </div>
-                        @endif
-
-                        {{-- CARRY OVER DEPAN (SELALU TAMPIL) --}}
-                        <div class="d-flex justify-content-between align-items-center pt-1">
-                            <span class="stat-label fw-bold text-bnpb-blue">Carry Over (Depan)</span>
-                            <span class="stat-value text-bnpb-blue">{{ $data['carry_over_tahun_depan'] }}</span>
+                        <div class="p-2 bg-white bg-opacity-25 rounded-circle">
+                            <i class="bi bi-wallet2 fs-4 text-white"></i>
                         </div>
                     </div>
 
-                @else
-                    <div class="text-center py-5 text-muted">
-                        <i class="bi bi-clipboard-data fs-1 d-block mb-3 opacity-25"></i>
-                        <p class="small">Silakan lakukan pencarian untuk melihat data sisa cuti.</p>
-                    </div>
-                @endif
-            </div>
-        </div>
-    </div>
+                    @if(!empty($data['cpns_notice']))
+                        <div class="p-3 mb-auto rounded-3 d-flex align-items-start" style="background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.1);">
+                            <i class="bi bi-info-circle-fill text-warning me-3 mt-1 fs-5"></i>
+                            <div class="text-white small" style="line-height: 1.5; font-size: 0.85rem;">
+                                <strong class="text-warning d-block mb-1">Status CPNS</strong>
+                                {{ $data['cpns_notice'] }}
+                            </div>
+                        </div>
 
-    <div class="col-md-6 fade-in-up delay-300">
-        <div class="card card-custom h-100">
-            <div class="card-header-custom">
-                <i class="bi bi-bar-chart-line text-bnpb-orange"></i> Statistik Bulanan
-            </div>
-            <div class="card-body p-3">
-                <div style="height: 300px; position: relative;">
-                    @if(isset($data))
-                        <canvas id="chartDonut"></canvas>
+                    @elseif($data['status_cuti_besar'])
+                        <div class="alert alert-warning border-0 py-2 px-3 small mb-auto">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i> Cuti Besar diambil (Sisa Hangus)
+                        </div>
+
                     @else
-                        <div class="d-flex flex-column align-items-center justify-content-center h-100 text-muted opacity-50">
-                            <i class="bi bi-pie-chart-fill fs-1 mb-2"></i>
-                            <span class="small">Menunggu data...</span>
+                        <div class="row g-2 mb-auto">
+                            <div class="col-6">
+                                <div class="stat-box-light">
+                                    <span class="d-block text-white-50 small" style="font-size: 0.7rem;">Jatah Dasar</span>
+                                    <span class="fw-bold">{{ $data['jatah_dasar'] }}</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-box-light">
+                                    <span class="d-block text-white-50 small" style="font-size: 0.7rem;">Carry Over (Lalu)</span>
+                                    <span class="fw-bold">+ {{ $data['carry_over_tahun_lalu'] }}</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-box-light">
+                                    <span class="d-block text-white-50 small" style="font-size: 0.7rem;">Total Potensi</span>
+                                    <span class="fw-bold">{{ $data['total_jatah'] }}</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-box-light position-relative overflow-hidden">
+                                    <span class="d-block text-white-50 small" style="font-size: 0.7rem;">Terpakai</span>
+                                    <span class="fw-bold text-warning">- {{ $data['cuti_terpakai'] }}</span>
+                                </div>
+                            </div>
                         </div>
                     @endif
+
+                    <div class="mt-3 pt-3 border-top border-white border-opacity-10 d-flex justify-content-between align-items-center">
+                        <span class="small text-white-50">Carry Over (Depan)</span>
+                        <span class="fw-bold">{{ $data['carry_over_tahun_depan'] }} Hari</span>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div class="col-md-6 fade-in-up delay-300">
-        <div class="card card-custom h-100">
-            <div class="card-header-custom">
-                <i class="bi bi-graph-up text-bnpb-orange"></i> Tren Jenis Cuti
-            </div>
-            <div class="card-body p-3">
-                <div style="height: 300px; position: relative;">
-                    @if(isset($data))
-                        <canvas id="chartLine"></canvas>
-                    @else
-                        <div class="d-flex flex-column align-items-center justify-content-center h-100 text-muted opacity-50">
-                            <i class="bi bi-graph-up-arrow fs-1 mb-2"></i>
-                            <span class="small">Menunggu data...</span>
-                        </div>
-                    @endif
+        @else
+            <div class="card card-custom text-center py-5 h-100 justify-content-center">
+                <div class="card-body">
+                    <img src="https://cdn-icons-png.flaticon.com/512/7486/7486754.png" width="80" class="opacity-25 mb-3">
+                    <h6 class="text-muted">Data Kosong</h6>
+                    <p class="small text-muted mb-0">
+                        <span class="d-none d-lg-inline">Lakukan pencarian pegawai di kiri.</span> <span class="d-lg-none">Lakukan pencarian pegawai di atas.</span> </p>
                 </div>
             </div>
-        </div>
+        @endif
     </div>
 
+    @if(isset($data))
     <div class="col-12 fade-in-up delay-300">
-        <div class="card card-custom">
-            <div class="card-header-custom d-flex justify-content-between align-items-center">
-                <span>
-                    <i class="bi bi-clock-history text-bnpb-orange"></i> Riwayat Cuti (Cuti Tahunan Only)
-                </span>
-                <button class="btn btn-sm btn-light border" type="button" data-bs-toggle="tooltip" title="Hanya menampilkan Cuti Tahunan">
-                    <i class="bi bi-info-circle"></i> Info
+        
+        <ul class="nav nav-pills nav-pills-custom mb-3" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="pills-history-tab" data-bs-toggle="pill" data-bs-target="#pills-history" type="button" role="tab" aria-controls="pills-history" aria-selected="true">
+                    <i class="bi bi-clock-history"></i> Riwayat Cuti
                 </button>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table align-middle mb-0 table-hover">
-                        <thead class="bg-light text-secondary">
-                            <tr>
-                                <th class="px-4 py-3 small fw-bold text-uppercase border-bottom">Jenis Cuti</th>
-                                <th class="px-4 py-3 small fw-bold text-uppercase border-bottom">Periode</th>
-                                <th class="px-4 py-3 small fw-bold text-uppercase border-bottom text-center">Durasi</th>
-                                <th class="px-4 py-3 small fw-bold text-uppercase border-bottom">Keterangan</th>
-                                <th class="px-4 py-3 small fw-bold text-uppercase border-bottom">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        @if(isset($data))
-                            @forelse($data['riwayat'] as $item)
-                            <tr>
-                                <td class="px-4 py-3">
-                                    <span class="fw-bold text-bnpb-blue small">{{ $item->jenis_cuti }}</span>
-                                </td>
-                                <td class="px-4 py-3 small text-muted">
-                                    <div class="d-flex flex-column">
-                                        <span><i class="bi bi-calendar-event me-1"></i> {{ \Carbon\Carbon::parse($item->tanggal_mulai)->format('d M Y') }}</span>
-                                        <span class="text-xs text-secondary ms-3">s/d {{ \Carbon\Carbon::parse($item->tanggal_selesai)->format('d M Y') }}</span>
-                                    </div>
-                                </td>
-                                <td class="px-4 py-3 text-center">
-                                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">{{ $item->lama_cuti }} Hari</span>
-                                </td>
-                                <td class="px-4 py-3 small text-secondary">
-                                    {{ Str::limit($item->keterangan ?? '-', 40) }}
-                                </td>
-                                <td class="px-4 py-3">
-                                    <span class="badge bg-success bg-opacity-10 text-success badge-status border border-success border-opacity-25">
-                                        <i class="bi bi-check-circle-fill me-1"></i> Disetujui
-                                    </span>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" class="text-center py-5">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/7486/7486754.png" alt="Empty" width="60" class="mb-3 opacity-50">
-                                    <p class="text-muted small mb-0">Belum ada riwayat cuti tahunan yang ditemukan.</p>
-                                </td>
-                            </tr>
-                            @endforelse
-                        @else
-                            <tr>
-                                <td colspan="5" class="text-center py-5 text-muted small">
-                                    Silakan lakukan pencarian pegawai terlebih dahulu.
-                                </td>
-                            </tr>
-                        @endif
-                        </tbody>
-                    </table>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pills-stats-tab" data-bs-toggle="pill" data-bs-target="#pills-stats" type="button" role="tab" aria-controls="pills-stats" aria-selected="false">
+                    <i class="bi bi-bar-chart-line"></i> Statistik
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="pills-tabContent">
+            
+            <div class="tab-pane fade show active" id="pills-history" role="tabpanel" aria-labelledby="pills-history-tab">
+                <div class="card card-custom">
+                    <div class="card-header-custom d-flex justify-content-between align-items-center">
+                         <span>Riwayat Pengajuan Cuti</span>
+                         <span class="badge bg-light text-secondary border fw-normal">{{ count($data['riwayat']) }} Data</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive table-responsive-mobile">  
+                            <table class="table align-middle mb-0 table-hover">
+                                <thead class="bg-light text-secondary">
+                                    <tr>
+                                        <th class="px-4 py-3 small fw-bold text-uppercase border-bottom">Jenis Cuti</th>
+                                        <th class="px-4 py-3 small fw-bold text-uppercase border-bottom">Periode</th>
+                                        <th class="px-4 py-3 small fw-bold text-uppercase border-bottom text-center">Durasi</th>
+                                        <th class="px-4 py-3 small fw-bold text-uppercase border-bottom text-center">Dokumen</th>
+                                        <th class="px-4 py-3 small fw-bold text-uppercase border-bottom">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($data['riwayat'] as $item)
+                                    <tr>
+                                        <td class="px-4 py-3">
+                                            <span class="fw-bold text-bnpb-blue small">
+                                                @if(stripos($item->jenis_cuti, 'alasan penting') !== false)
+                                                    <span class="d-md-none">Cuti CAP</span>
+                                                    <span class="d-none d-md-inline">{{ $item->jenis_cuti }}</span>
+                                                @else
+                                                    {{ $item->jenis_cuti }}
+                                                @endif
+                                            </span>
+                                        </td>
+                                        
+                                        <td class="px-4 py-3 small text-muted">
+                                            <div class="d-flex flex-column">
+                                                <span><i class="bi bi-calendar-event me-1"></i> {{ \Carbon\Carbon::parse($item->tanggal_mulai)->format('d M Y') }}</span>
+                                                <span class="text-xs text-secondary ms-3">s/d {{ \Carbon\Carbon::parse($item->tanggal_selesai)->format('d M Y') }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3 text-center">
+                                            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">{{ $item->lama_cuti }} Hari</span>
+                                        </td>
+                                        
+                                        <td class="px-4 py-3 text-center">
+                                            @php
+                                                $jenis = strtolower($item->jenis_cuti);
+                                                $bisaCetak = in_array($jenis, ['cuti tahunan', 'cuti sakit', 'cuti alasan penting', 'cuti cap']);
+                                            @endphp
+
+                                            @if($bisaCetak)
+                                                <a href="{{ route('cetak.surat', ['id' => $item->id]) }}" 
+                                                   class="btn btn-sm btn-outline-success mb-0 shadow-none px-3" 
+                                                   title="Download Surat Word">
+                                                   <i class="bi bi-file-earmark-word-fill me-1"></i> Word
+                                                </a>
+                                            @else
+                                                <span class="text-muted small" style="font-size: 0.8rem;">-</span>
+                                            @endif
+                                        </td>
+
+                                        <td class="px-4 py-3">
+                                            <span class="badge bg-success bg-opacity-10 text-success badge-status border border-success border-opacity-25">
+                                                <i class="bi bi-check-circle-fill me-1"></i> Disetujui
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center py-5">
+                                            <img src="https://cdn-icons-png.flaticon.com/512/7486/7486754.png" alt="Empty" width="60" class="mb-3 opacity-50">
+                                            <p class="text-muted small mb-0">Belum ada riwayat cuti yang ditemukan.</p>
+                                        </td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <div class="tab-pane fade" id="pills-stats" role="tabpanel" aria-labelledby="pills-stats-tab">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="card card-custom h-100">
+                            <div class="card-header-custom">
+                                <i class="bi bi-pie-chart text-bnpb-orange"></i> Statistik Bulanan
+                            </div>
+                            <div class="card-body p-3">
+                                <div style="height: 300px; position: relative;">
+                                    <canvas id="chartDonut"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card card-custom h-100">
+                            <div class="card-header-custom">
+                                <i class="bi bi-graph-up text-bnpb-orange"></i> Tren Jenis Cuti
+                            </div>
+                            <div class="card-body p-3">
+                                <div style="height: 300px; position: relative;">
+                                    <canvas id="chartLine"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
+    @endif
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -407,8 +504,6 @@
     
     if(form) {
         form.addEventListener('submit', function() {
-            // Cek apakah tombol yang diklik adalah export (jangan loading state kalo export)
-            // Tapi karena form submit generic, kita bisa kasih delay dikit visual feedback
             const originalText = btnCari.innerHTML;
             btnCari.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Memproses...';
             btnCari.classList.add('disabled');
@@ -425,11 +520,9 @@
 @if(isset($data))
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // --- DATA DARI CONTROLLER ---
         const donutData = @json($data['chart_donut']); 
         const lineDataSets = @json($data['chart_line']); 
 
-        // --- CHART 1: DONUT (Bulanan) ---
         const ctxDonut = document.getElementById('chartDonut').getContext('2d');
         new Chart(ctxDonut, {
             type: 'doughnut',
@@ -450,27 +543,14 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutout: '70%', // Donut lebih tipis
+                cutout: '70%', 
                 plugins: {
-                    legend: { 
-                        position: 'right', 
-                        labels: { 
-                            boxWidth: 12, 
-                            usePointStyle: true,
-                            font: { size: 11 }
-                        } 
-                    }
+                    legend: { position: 'right', labels: { boxWidth: 12, usePointStyle: true, font: { size: 11 } } }
                 },
-                animation: {
-                    animateScale: true,
-                    animateRotate: true,
-                    duration: 1500,
-                    easing: 'easeOutQuart'
-                }
+                animation: { animateScale: true, animateRotate: true, duration: 1500, easing: 'easeOutQuart' }
             }
         });
 
-        // --- CHART 2: LINE (Jenis Cuti) ---
         const ctxLine = document.getElementById('chartLine').getContext('2d');
         new Chart(ctxLine, {
             type: 'line',
@@ -481,32 +561,18 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
                 plugins: {
-                    legend: { position: 'bottom', labels: { usePointStyle: true } }
+                    legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } },
+                    tooltip: { enabled: true, backgroundColor: 'rgba(0, 0, 0, 0.8)', padding: 12, titleFont: { size: 14 }, bodyFont: { size: 13 } }
                 },
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { stepSize: 1 },
-                        grid: { borderDash: [5, 5] }
-                    },
-                    x: {
-                        grid: { display: false }
-                    }
+                    y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: { borderDash: [5, 5] } },
+                    x: { grid: { display: false }, ticks: { font: { size: 11 } } }
                 },
-                elements: {
-                    line: { tension: 0.4 }, // Smooth curve
-                    point: { radius: 4, hoverRadius: 6 }
-                },
-                interaction: {
-                    mode: 'index',
-                    intersect: false,
-                },
-                animation: {
-                    duration: 2000,
-                    easing: 'easeOutQuart'
-                }
-            }
+                elements: { line: { tension: 0.4 }, point: { radius: 4, hitRadius: 20, hoverRadius: 6 } },
+                animation: { duration: 2000, easing: 'easeOutQuart' }
+            }   
         });
     });
 </script>

@@ -24,8 +24,13 @@ Route::get('/', [CekCutiController::class, 'index'])->name('cek-cuti.index');
 Route::post('/cek-cuti', [CekCutiController::class, 'check'])->name('cek-cuti.check');
 
 // 3. FIX ERROR REFRESH: Menangani jika user refresh halaman hasil (GET /cek-cuti)
-//    Akan diarahkan kembali ke tampilan awal tanpa error.
 Route::get('/cek-cuti', [CekCutiController::class, 'index']);
+
+// 4. Export Excel
+Route::post('/cek-cuti/export', [CekCutiController::class, 'export'])->name('cek-cuti.export');
+
+// 5. [BARU] Cetak Surat Cuti
+Route::get('/cetak-surat/{id}', [CekCutiController::class, 'cetakSurat'])->name('cetak.surat');
 
 
 // --- HALAMAN ADMIN (IMPORT DATA) ---
@@ -35,6 +40,3 @@ Route::get('/import-data', [ImportController::class, 'index'])->name('import.ind
 
 // 2. Memproses Upload File Excel
 Route::post('/import-data', [ImportController::class, 'store'])->name('import.store');
-
-// Tambahkan route POST ini di bawah route cek-cuti.check
-Route::post('/cek-cuti/export', [CekCutiController::class, 'export'])->name('cek-cuti.export');

@@ -20,28 +20,96 @@
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-light);
             color: #334155;
+            overflow-x: hidden; /* Mencegah scroll saat loading */
         }
 
-        /* --- SIDEBAR STYLE (UPDATED) --- */
+        /* --- [MULAI] SPLASH SCREEN STYLE --- */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            z-index: 99999; /* Paling depan */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.6s ease-out, visibility 0.6s ease-out;
+        }
+
+        /* Class untuk menghilangkan splash screen */
+        #splash-screen.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Animasi Logo Berdenyut */
+        .splash-logo {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Animasi Dots Loading */
+        .loading-dots {
+            display: flex;
+            gap: 8px;
+            margin-top: 20px;
+        }
+        .dot {
+            width: 10px;
+            height: 10px;
+            background-color: var(--bnpb-orange);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        /* --- [SELESAI] SPLASH SCREEN STYLE --- */
+
+        /* --- SIDEBAR STYLE DESKTOP --- */
         .sidebar {
             background-color: var(--bnpb-blue);
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-            
-            /* LOGIKA AGAR NAVIGASI DIAM DI TEMPAT SAAT SCROLL */
-            position: sticky;       /* Membuat elemen menempel */
-            top: 0;                 /* Menempel di bagian paling atas layar */
-            height: 100vh;          /* Tinggi sidebar pas 1 layar penuh */
-            overflow-y: auto;       /* Jika menu terlalu banyak, bisa discroll di dalam sidebar */
-            z-index: 1000;          /* Agar berada di atas elemen lain */
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.3s ease-in-out;
         }
 
-        /* Kustomisasi Scrollbar untuk Sidebar (Opsional - agar lebih rapi) */
-        .sidebar::-webkit-scrollbar {
-            width: 5px;
-        }
-        .sidebar::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
-            border-radius: 10px;
+        /* --- SIDEBAR STYLE MOBILE --- */
+        @media (max-width: 767.98px) {
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                top: 0;
+                bottom: 0;
+                width: 280px;
+                height: 100%;
+                z-index: 1050; 
+            }
+            .sidebar.show { left: 0; }
+            .sidebar-overlay {
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 1040;
+                display: none;
+                backdrop-filter: blur(2px);
+            }
+            .sidebar-overlay.show { display: block; }
         }
 
         .sidebar-brand {
@@ -56,7 +124,6 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
             margin-bottom: 20px;
         }
-        
         .sidebar-brand:hover { color: #fff; }
 
         .sidebar .nav-link {
@@ -69,17 +136,8 @@
             align-items: center;
             transition: all 0.3s;
         }
-
-        .sidebar .nav-link i {
-            margin-right: 12px;
-            font-size: 1.1rem;
-        }
-
-        .sidebar .nav-link:hover {
-            color: #ffffff;
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
+        .sidebar .nav-link i { margin-right: 12px; font-size: 1.1rem; }
+        .sidebar .nav-link:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.1); }
         .sidebar .nav-link.active {
             background-color: var(--bnpb-orange);
             color: #ffffff;
@@ -88,33 +146,80 @@
         }
 
         /* --- CONTENT STYLE --- */
-        .main-content {
-            padding: 30px;
-            /* Pastikan konten tidak tertutup sidebar */
+        .main-content { padding: 20px; }
+        @media (min-width: 768px) { .main-content { padding: 30px; } }
+
+        /* --- NAVBAR MOBILE --- */
+        .navbar-mobile {
+            background-color: var(--bnpb-blue) !important; 
+            color: white;
+            position: relative; 
+            z-index: 990; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+            border-radius: 8px !important;
+            margin-bottom: 1.5rem; 
         }
 
-        .navbar-mobile {
-            background-color: var(--bnpb-blue);
-            color: white;
+        /* --- TABLE RESPONSIVE MOBILE --- */
+        @media (max-width: 767.98px) {
+            .table-responsive-mobile {
+                display: block; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;
+            }
+            .table-responsive-mobile .table th,
+            .table-responsive-mobile .table td { white-space: nowrap; }
         }
+
+        /* Custom Tabs & Cards */
+        .nav-pills-custom .nav-link {
+            color: #64748b; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px;
+            font-size: 0.9rem; font-weight: 600; padding: 8px 16px; margin-right: 8px; transition: all 0.2s;
+        }
+        .nav-pills-custom .nav-link.active {
+            background-color: var(--bnpb-blue); color: #fff; border-color: var(--bnpb-blue);
+            box-shadow: 0 4px 6px rgba(15, 56, 120, 0.2);
+        }
+        .card-hero { background: linear-gradient(135deg, #0f3878 0%, #1e4d9c 100%); color: white; border: none; }
+        .stat-box-light { background: rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 10px; backdrop-filter: blur(5px); }
         
         footer {
-            color: #94a3b8;
-            font-size: 0.85rem;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #e2e8f0;
+            color: #94a3b8; font-size: 0.85rem; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0;
         }
     </style>
 </head>
 <body>
 
+<div id="splash-screen">
+    <img src="{{ asset('img/logo_bnpb.png') }}" alt="BNPB Logo" width="120" class="splash-logo mb-3">
+    
+    <h5 class="fw-bold" style="color: var(--bnpb-blue); letter-spacing: 1px;">MANAJEMEN CUTI</h5>
+    <p class="text-muted small">Badan Nasional Penanggulangan Bencana</p>
+    
+    <div class="loading-dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+    </div>
+</div>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-3 col-lg-2 d-none d-md-block sidebar px-0">
-            <a href="#" class="sidebar-brand">
-                <i class="bi bi-building-fill-check fs-4 text-warning"></i>
-                <span>Cuti BNPB</span>
+        
+        <div class="col-md-3 col-lg-2 sidebar px-0" id="sidebarMenu">
+            
+            <div class="d-flex justify-content-between align-items-center pe-3 d-md-none">
+                <a href="#" class="sidebar-brand mb-0 border-0">
+                    <img src="{{ asset('img/logo_bnpb.png') }}" alt="Logo" height="35" class="d-inline-block align-text-top">
+                    <span class="ms-2">Cuti BNPB</span>
+                </a>
+                <button class="btn btn-sm text-white-50" onclick="toggleSidebar()">
+                    <i class="bi bi-x-lg fs-4"></i>
+                </button>
+            </div>
+
+            <a href="#" class="sidebar-brand d-none d-md-flex">
+                <img src="{{ asset('img/logo_bnpb.png') }}" alt="Logo" height="35" class="d-inline-block align-text-top">
+                <span class="ms-2">Cuti BNPB</span>
             </a>
             
             <ul class="nav flex-column">
@@ -132,11 +237,15 @@
         </div>
 
         <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
+            
             <nav class="navbar navbar-mobile d-md-none mb-4 rounded shadow-sm px-3 py-2">
                 <div class="d-flex align-items-center w-100 justify-content-between">
-                    <span class="navbar-brand mb-0 h1 text-white">Cuti BNPB</span>
-                    <button class="btn btn-sm btn-outline-light" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu">
-                        <i class="bi bi-list"></i>
+                    <div class="d-flex align-items-center gap-2">
+                        <img src="{{ asset('img/logo_bnpb.png') }}" alt="Logo" height="30">
+                        <span class="fw-bold text-white small">Cuti BNPB</span>
+                    </div>
+                    <button class="btn btn-sm text-white border-0" type="button" onclick="toggleSidebar()">
+                        <i class="bi bi-list fs-4"></i>
                     </button>
                 </div>
             </nav>
@@ -151,5 +260,32 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Script Toggle Sidebar Mobile
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebarMenu');
+        const overlay = document.getElementById('sidebarOverlay');
+        sidebar.classList.toggle('show');
+        overlay.classList.toggle('show');
+    }
+
+    // [SCRIPT SPLASH SCREEN]
+    // Dijalankan ketika seluruh halaman & gambar selesai dimuat
+    window.addEventListener('load', function() {
+        const splashScreen = document.getElementById('splash-screen');
+        
+        // Beri sedikit jeda minimal 1.5 detik agar animasi terlihat
+        setTimeout(function() {
+            splashScreen.classList.add('hide'); // Tambahkan class untuk fade-out
+            
+            // Hapus elemen dari DOM setelah animasi css selesai (600ms)
+            setTimeout(() => {
+                splashScreen.remove();
+            }, 600);
+            
+        }, 1500); // 1500ms = 1.5 Detik tampilan loading
+    });
+</script>
 </body>
 </html>
