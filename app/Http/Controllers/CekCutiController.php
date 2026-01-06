@@ -361,5 +361,5 @@ class CekCutiController extends Controller
             // Variabel Notifikasi
             'cpns_notice' => $cpnsNotice 
         ];
-    }
+    } 
 }

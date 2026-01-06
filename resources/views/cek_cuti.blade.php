@@ -23,7 +23,7 @@
     .delay-200 { animation-delay: 0.2s; }
     .delay-300 { animation-delay: 0.3s; }
 
-    /* --- CUSTOM CARD STYLE --- */
+    /* --- CUSTOM CARD STYLE (Box Putih) --- */
     .card-custom {
         background: #ffffff;
         border: none;
@@ -249,14 +249,23 @@
                         <button type="submit" class="btn btn-bnpb-primary btn-mobile-fix flex-grow-1 flex-md-grow-0" id="btnCari">
                             <i class="bi bi-search me-2"></i> 
                             <span>Cari Data</span>
+                    <div class="d-flex gap-2 gap-md-3">
+                        
+                        <button type="submit" class="btn btn-bnpb-primary btn-mobile-fix flex-grow-1 flex-md-grow-0" id="btnCari">
+                            <i class="bi bi-search me-2"></i> 
+                            <span>Cari Data</span>
                         </button>
                         
                         @if(isset($data))
                         <button type="submit" formaction="{{ route('cek-cuti.export') }}" class="btn btn-bnpb-secondary btn-mobile-fix flex-grow-1 flex-md-grow-0">
                             <i class="bi bi-file-earmark-excel me-2"></i> 
                             <span>Export Excel</span>
+                        <button type="submit" formaction="{{ route('cek-cuti.export') }}" class="btn btn-bnpb-secondary btn-mobile-fix flex-grow-1 flex-md-grow-0">
+                            <i class="bi bi-file-earmark-excel me-2"></i> 
+                            <span>Export Excel</span>
                         </button>
                         @endif
+                        
                         
                     </div>
                 </form>
@@ -328,7 +337,17 @@
                                     <span class="d-block text-white-50 small" style="font-size: 0.7rem;">Carry Over (Lalu)</span>
                                     <span class="fw-bold">+ {{ $data['carry_over_tahun_lalu'] }}</span>
                                 </div>
+                            <div class="col-6">
+                                <div class="stat-box-light">
+                                    <span class="d-block text-white-50 small" style="font-size: 0.7rem;">Carry Over (Lalu)</span>
+                                    <span class="fw-bold">+ {{ $data['carry_over_tahun_lalu'] }}</span>
+                                </div>
                             </div>
+                            <div class="col-6">
+                                <div class="stat-box-light">
+                                    <span class="d-block text-white-50 small" style="font-size: 0.7rem;">Total Potensi</span>
+                                    <span class="fw-bold">{{ $data['total_jatah'] }}</span>
+                                </div>
                             <div class="col-6">
                                 <div class="stat-box-light">
                                     <span class="d-block text-white-50 small" style="font-size: 0.7rem;">Total Potensi</span>
@@ -340,9 +359,19 @@
                                     <span class="d-block text-white-50 small" style="font-size: 0.7rem;">Terpakai</span>
                                     <span class="fw-bold text-warning">- {{ $data['cuti_terpakai'] }}</span>
                                 </div>
+                            <div class="col-6">
+                                <div class="stat-box-light position-relative overflow-hidden">
+                                    <span class="d-block text-white-50 small" style="font-size: 0.7rem;">Terpakai</span>
+                                    <span class="fw-bold text-warning">- {{ $data['cuti_terpakai'] }}</span>
+                                </div>
                             </div>
                         </div>
                     @endif
+
+                    <div class="mt-3 pt-3 border-top border-white border-opacity-10 d-flex justify-content-between align-items-center">
+                        <span class="small text-white-50">Carry Over (Depan)</span>
+                        <span class="fw-bold">{{ $data['carry_over_tahun_depan'] }} Hari</span>
+                    </div>
 
                     <div class="mt-3 pt-3 border-top border-white border-opacity-10 d-flex justify-content-between align-items-center">
                         <span class="small text-white-50">Carry Over (Depan)</span>
@@ -360,10 +389,22 @@
                 </div>
             </div>
         @endif
+        @endif
     </div>
 
     @if(isset($data))
+    @if(isset($data))
     <div class="col-12 fade-in-up delay-300">
+        
+        <ul class="nav nav-pills nav-pills-custom mb-3" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="pills-history-tab" data-bs-toggle="pill" data-bs-target="#pills-history" type="button" role="tab" aria-controls="pills-history" aria-selected="true">
+                    <i class="bi bi-clock-history"></i> Riwayat Cuti
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pills-stats-tab" data-bs-toggle="pill" data-bs-target="#pills-stats" type="button" role="tab" aria-controls="pills-stats" aria-selected="false">
+                    <i class="bi bi-bar-chart-line"></i> Statistik
         
         <ul class="nav nav-pills nav-pills-custom mb-3" id="pills-tab" role="tablist">
             <li class="nav-item" role="presentation">
@@ -543,6 +584,7 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                cutout: '70%', 
                 cutout: '70%', 
                 plugins: {
                     legend: { position: 'right', labels: { boxWidth: 12, usePointStyle: true, font: { size: 11 } } }

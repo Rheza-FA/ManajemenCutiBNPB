@@ -94,6 +94,7 @@
         .main-content { padding: 20px; }
         @media (min-width: 768px) { .main-content { padding: 30px; } }
 
+       /* --- NAVBAR MOBILE STYLE (NO STICKY) --- */
         .navbar-mobile {
             background-color: var(--bnpb-blue) !important; color: white;
             position: relative; z-index: 990; 
