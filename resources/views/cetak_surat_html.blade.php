@@ -178,7 +178,7 @@
                 <div>
                     <strong>Tembusan:</strong>
                     <ol style="margin-top: 2px; padding-left: 18px; margin-bottom: 0;">
-                        <li>........................................................;</li>
+                        <li>.................;</li>
                         <li>Yang Bersangkutan.</li>
                     </ol>
                 </div>
