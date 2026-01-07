@@ -56,11 +56,23 @@
         border-radius: 10px;
         font-size: 0.95rem;
         transition: border-color 0.2s, box-shadow 0.2s;
+        
+        /* [PERBAIKAN MOBILE] Background putih & text gelap agar input date terlihat */
+        background-color: #ffffff;
+        color: #334155;
+        min-height: 48px; /* Tinggi yang nyaman untuk sentuhan jari */
     }
     .form-control-custom:focus {
         border-color: #ff6b00;
         box-shadow: 0 0 0 4px rgba(255, 107, 0, 0.1);
         outline: none;
+    }
+    
+    /* [PERBAIKAN MOBILE] CSS agar icon kalender & teks tanggal muncul benar di HP */
+    input[type="date"] {
+        -webkit-appearance: none;
+        appearance: none;
+        position: relative;
     }
     
     label.form-label {
@@ -124,14 +136,13 @@
         border: none;
         border-radius: 16px;
         overflow: hidden;
-        /* [BARU] Tambahkan transisi agar animasi halus */
+        /* Tambahkan transisi agar animasi halus */
         transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
     
-    /* [BARU] Efek Hover untuk Box Biru */
+    /* Efek Hover untuk Box Biru */
     .card-hero:hover {
-        transform: translateY(-5px); /* Naik ke atas 5px */
-        /* Shadow biru agar terlihat glowing */
+        transform: translateY(-5px);
         box-shadow: 0 15px 35px rgba(15, 56, 120, 0.4) !important; 
     }
 
@@ -167,37 +178,42 @@
     .nav-pills-custom .nav-link i {
         margin-right: 6px;
     }
-    /* --- FIX TOMBOL MOBILE ONLY --- */
+
+    /* --- FIX TOMBOL & LAYOUT MOBILE ONLY --- */
     @media (max-width: 767.98px) {
         .btn-mobile-fix {
-            /* 1. Rampingkan tombol & Text 1 baris */
+            /* Rampingkan tombol & Text 1 baris */
             padding: 8px 10px !important; 
             font-size: 0.85rem !important; 
             white-space: nowrap; 
             
-            /* 2. Flexbox untuk sentralisasi isi tombol */
+            /* Flexbox untuk sentralisasi isi tombol */
             display: flex !important;
             align-items: center;
             justify-content: center;
             
-            /* 3. Paksa lebar penuh (mengikuti flex parent) */
+            /* Paksa lebar penuh */
             width: 100%; 
         }
 
-        /* 4. Sesuaikan ukuran Icon */
+        /* Sesuaikan ukuran Icon */
         .btn-mobile-fix i {
             font-size: 1.1rem !important;
         }
         
-        /* 5. Override margin 'me-2' bawaan Bootstrap KHUSUS di mobile */
-        /* Agar jarak icon ke teks lebih rapat/pas di layar kecil */
+        /* Override margin 'me-2' bawaan Bootstrap KHUSUS di mobile */
         .btn-mobile-fix .me-2 {
             margin-right: 6px !important; 
+        }
+
+        /* [PERBAIKAN MOBILE] Alignment Header agar sejajar dengan teks Navbar */
+        .mobile-header-align {
+            padding-left: 6px; /* Geser sedikit ke kanan */
         }
     }
 </style>
 
-<div class="d-flex justify-content-between align-items-center mb-5 fade-in-up">
+<div class="d-flex justify-content-between align-items-center mb-3 mb-md-5 fade-in-up mobile-header-align">
     <div>
         <h3 class="fw-bold text-bnpb-blue mb-1">
             <i class="bi bi-speedometer2 me-2"></i>Dashboard Cuti
@@ -249,11 +265,12 @@
                         <div class="col-md-6">
                             <label for="tgl_dari" class="form-label">Periode Awal</label>
                             <input type="date" class="form-control form-control-custom" id="tgl_dari" name="tgl_dari" 
-                                   value="{{ old('tgl_dari', $data['tahun'] ?? date('Y') . '-01-01') }}">
+                                   value="{{ old('tgl_dari', isset($data['tahun']) ? $data['tahun'].'-01-01' : date('Y').'-01-01') }}">
                         </div>
                         <div class="col-md-6">
                             <label for="tgl_sampai" class="form-label">Periode Akhir</label>
-                            <input type="date" class="form-control form-control-custom" id="tgl_sampai" name="tgl_sampai">
+                            <input type="date" class="form-control form-control-custom" id="tgl_sampai" name="tgl_sampai"
+                                   value="{{ old('tgl_sampai', isset($data['tahun']) ? $data['tahun'].'-12-31' : date('Y').'-12-31') }}">
                         </div>
                     </div>
 
