@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     <style>
         :root {
             --bnpb-blue: #0f3878;
@@ -76,28 +78,19 @@
                 width: 280px;
                 height: 100%;
                 z-index: 1050;
-                /* Paling atas */
             }
 
-            .sidebar.show {
-                left: 0;
-            }
+            .sidebar.show { left: 0; }
 
             .sidebar-overlay {
                 position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
+                top: 0; left: 0; right: 0; bottom: 0;
                 background: rgba(0, 0, 0, 0.5);
                 z-index: 1040;
                 display: none;
                 backdrop-filter: blur(2px);
             }
 
-            .sidebar-overlay.show {
-                display: block;
-            }
             .sidebar-overlay.show { display: block; }
         }
 
@@ -114,9 +107,7 @@
             margin-bottom: 20px;
         }
 
-        .sidebar-brand:hover {
-            color: #fff;
-        }
+        .sidebar-brand:hover { color: #fff; }
 
         .sidebar .nav-link {
             color: rgba(255, 255, 255, 0.7); font-weight: 500; padding: 12px 20px; margin: 4px 15px;
@@ -131,19 +122,16 @@
             font-weight: 600;
         }
 
-        /* --- CONTENT STYLE --- */
+        /* --- CONTENT STYLE (PUNYA ANDA - DIPERTAHANKAN) --- */
         .main-content {
-            padding: 16px;
-            /* Kurangi padding mobile agar space lebih luas */
+            padding: 16px; /* Tetap 16px sesuai request Anda */
         }
 
         @media (min-width: 768px) {
-            .main-content {
-                padding: 30px;
-            }
+            .main-content { padding: 30px; }
         }
 
-        /* --- NAVBAR MOBILE STYLE --- */
+        /* --- NAVBAR MOBILE STYLE (PUNYA ANDA - DIPERTAHANKAN) --- */
         .navbar-mobile {
             background-color: var(--bnpb-blue) !important;
             color: white;
@@ -151,73 +139,36 @@
             z-index: 990;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
             border-radius: 8px !important;
-
-            /* FIX JARAK 1: Kurangi margin bawah dari mb-4 jadi mb-3 */
-            margin-bottom: 1rem;
+            margin-bottom: 1rem; /* Tetap 1rem */
         }
 
         @media (max-width: 767.98px) {
-
-            /* Agar tabel bisa di-scroll ke samping */
             .table-responsive-mobile {
-                display: block;
-                width: 100%;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
+                display: block; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;
             }
-
-            /* Agar teks Periode memanjang ke samping (tidak tumpuk ke bawah) */
             .table-responsive-mobile .table th,
             .table-responsive-mobile .table td {
                 white-space: nowrap;
             }
         }
 
-        /* Custom Tabs untuk Mobile */
-        .nav-pills-custom .nav-link {
-            color: #64748b;
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            padding: 8px 16px;
-            margin-right: 8px;
-            transition: all 0.2s;
-        }
-
-        .nav-pills-custom .nav-link.active {
-            background-color: var(--bnpb-blue);
-            color: #fff;
-            border-color: var(--bnpb-blue);
-            box-shadow: 0 4px 6px rgba(15, 56, 120, 0.2);
-        }
-
-        /* Card Modern */
-        .card-hero {
-            background: linear-gradient(135deg, #0f3878 0%, #1e4d9c 100%);
-            color: white;
-            border: none;
-        }
-
-        .stat-box-light {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 10px;
-            backdrop-filter: blur(5px);
-        }
-
+        /* Footer */
         footer {
-            color: #94a3b8;
-            font-size: 0.85rem;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #e2e8f0;
+            color: #94a3b8; font-size: 0.85rem; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0;
         }
     </style>
 </head>
 
 <body>
+
+    <div id="splash-screen">
+        <img src="{{ asset('img/logo_bnpb.png') }}" alt="BNPB Logo" style="width: 100px; height: auto;" class="splash-logo mb-3">
+        <h5 class="fw-bold" style="color: var(--bnpb-blue); letter-spacing: 1px;">MANAJEMEN CUTI</h5>
+        <p class="text-muted small">Badan Nasional Penanggulangan Bencana</p>
+        <div class="loading-dots">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+    </div>
 
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
@@ -226,8 +177,8 @@
             <div class="col-md-3 col-lg-2 sidebar px-0" id="sidebarMenu">
                 <div class="d-flex justify-content-between align-items-center pe-3 d-md-none">
                     <a href="#" class="sidebar-brand mb-0 border-0">
-                        <i class="bi bi-building-fill-check fs-4 text-warning"></i>
-                        <span>Cuti BNPB</span>
+                        <img src="{{ asset('img/logo_bnpb.png') }}" alt="Logo" style="height: 28px; width: auto;" class="d-inline-block align-text-top">
+                        <span class="ms-2">Cuti BNPB</span>
                     </a>
                     <button class="btn btn-sm text-white-50" onclick="toggleSidebar()">
                         <i class="bi bi-x-lg fs-4"></i>
@@ -235,8 +186,8 @@
                 </div>
 
                 <a href="#" class="sidebar-brand d-none d-md-flex">
-                    <i class="bi bi-building-fill-check fs-4 text-warning"></i>
-                    <span>Cuti BNPB</span>
+                    <img src="{{ asset('img/logo_bnpb.png') }}" alt="Logo" style="height: 28px; width: auto;" class="d-inline-block align-text-top">
+                    <span class="ms-2">Cuti BNPB</span>
                 </a>
 
                 <ul class="nav flex-column">
@@ -246,7 +197,6 @@
                             <i class="bi bi-speedometer2"></i> Dashboard
                         </a>
                     </li>
-
                 </ul>
             </div>
 
@@ -254,7 +204,7 @@
                 <nav class="navbar navbar-mobile d-md-none mb-3 rounded shadow-sm px-3 py-2">
                     <div class="d-flex align-items-center w-100 justify-content-between">
                         <div class="d-flex align-items-center gap-2">
-                            <i class="bi bi-building-fill-check text-warning"></i>
+                            <img src="{{ asset('img/logo_bnpb.png') }}" alt="Logo" style="height: 24px; width: auto;">
                             <span class="fw-bold text-white small">Cuti BNPB</span>
                         </div>
                         <button class="btn btn-sm text-white border-0" type="button" onclick="toggleSidebar()">
@@ -275,7 +225,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Script Sederhana untuk Toggle Sidebar Mobile
+        // Toggle Sidebar Mobile
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebarMenu');
             const overlay = document.getElementById('sidebarOverlay');
@@ -283,6 +233,35 @@
             sidebar.classList.toggle('show');
             overlay.classList.toggle('show');
         }
+
+        // [LOGIKA SPLASH SCREEN PINTAR]
+        document.addEventListener("DOMContentLoaded", function() {
+            const splashScreen = document.getElementById('splash-screen');
+            
+            // 1. Cek apakah user sudah melihat splash screen?
+            const hasSeenSplash = sessionStorage.getItem('bnpb_splash_seen');
+
+            if (hasSeenSplash) {
+                // JIKA SUDAH: Hapus langsung
+                if(splashScreen) {
+                    splashScreen.style.display = 'none'; 
+                    splashScreen.remove();
+                }
+            } else {
+                // JIKA BELUM: Jalankan animasi
+                window.addEventListener('load', function() {
+                    setTimeout(function() {
+                        if(splashScreen) {
+                            splashScreen.classList.add('hide'); 
+                            setTimeout(() => {
+                                splashScreen.remove(); 
+                                sessionStorage.setItem('bnpb_splash_seen', 'true');
+                            }, 500);
+                        }
+                    }, 1500); 
+                });
+            }
+        });
     </script>
 </body>
 
